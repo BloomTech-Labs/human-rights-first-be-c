@@ -76,10 +76,59 @@ We're pulling data from similiar APIs(All locations V2 - https://raw.githubuserc
 
 #### 🚫 back end framework goes here (link to BE REPO)
 
-- point one
-- point two
-- point three
+#### Body
+      
+### incidents table 
 
+| Name        | Type       | Required | Description                                          |
+| ----------- | ---------- | -------- | ---------------------------------------------------- |
+| incident_id | increments | Yes      | records the number of the entreys                    |
+| ds_uuid     | String     | Yes      | gives it unque id                                    |
+| city        | String     | Yes      | gives the city the incident took place               |
+| state       | String     | Yes      | gives the state the incident took place              |
+| lat         | float      | Yes      | gives the latitude of the incident on the world map  |
+| long        | float      | Yes      | gives the longitude of the incident on the world map |
+| title       | String     | Yes      | gives the title of the incident                      |
+| desc        | varchar    | No       | gives the description of the incident                |
+| date        | date       | No       | gives the date of the incident                       |
+
+### sources table 
+
+| Name        | Type       | Required | Description                                          |
+| ----------- | ---------- | -------- | ---------------------------------------------------- |
+| src_id      | increments | Yes      | records the number of the entreys                    |
+| incident_id | String     | No       | gives it unque id                                    |
+| src_url     | String     | No       | gives the city the incident took place               |
+| src_type    | String     | No       | gives the state the incident took place              |
+
+### incident_type_of_force table 
+
+| Name             | Type       | Required | Description                                          |
+| ---------------- | ---------- | -------- | ---------------------------------------------------- |
+| itof_id          | increments | Yes      | records the number of the entreys                    |
+| type_of_force_id | String     | Yes      | gives it unque id                                    |
+| incident_id      | String     | Yes      | gives the city the incident took place               |
+
+### type_of_force table 
+
+| Name             | Type       | Required | Description                                          |
+| ---------------- | ---------- | -------- | ---------------------------------------------------- |
+| type_of_force_id | increments | No       | records the number of the entreys                    |
+| type_of_force    | String     | No       | gives it unque id                                    |
+
+```javascript
+{
+    "incident_id": "Test",
+    "ds_uuid": "Test",
+    "city": "test",
+    "state": "test"
+    "lat": "test"
+    "long": "test"
+    "title": "test"
+    "desc": "test"
+    "date": "test"
+}
+```
 🚫 List the rest of the back end end features and libraries in the same format as the framework above
 
 # APIs
