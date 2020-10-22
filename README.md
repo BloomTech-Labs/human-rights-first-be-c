@@ -343,11 +343,11 @@ Tweepy is a Python library that allows users to access the Twitter API. We used 
 
 In order for the app to function correctly, the user must set up their own environment variables. There should be a .env file containing the following:
 
-OKTA_URL_ISSUER = https://auth.lambdalabs.dev/oauth2/default
+OKTA_URL_ISSUER = okta isser id
 
-OKTA_CLIENT_ID = 0oalwp37fU2aV9UEG4x6
+OKTA_CLIENT_ID = okta client id
 
-DATABASE_URL = postgres://ugkakqld:oZSXjtaGFA1r1psfCfIfv1ZEJID1j4KM@raja.db.elephantsql.com:5432/ugkakqld?ssl=true
+DATABASE_URL = into postgres url
 
 # Testing
 
