@@ -343,7 +343,7 @@ Tweepy is a Python library that allows users to access the Twitter API. We used 
 
 In order for the app to function correctly, the user must set up their own environment variables. There should be a .env file containing the following:
 
-OKTA_URL_ISSUER = okta isser id
+OKTA_URL_ISSUER = okta issuer id
 
 OKTA_CLIENT_ID = okta client id
 
