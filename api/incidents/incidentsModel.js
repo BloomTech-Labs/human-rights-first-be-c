@@ -21,7 +21,7 @@ async function getSourcesById(incident_id) {
 
 async function createIncident(incident) {
   const newIncident = {
-    id: incident.id,
+    id: incident.case_id,
     city: incident.city,
     state: incident.state,
     title: incident.title,
@@ -31,7 +31,7 @@ async function createIncident(incident) {
     date: incident.date,
   };
   const incidentID = await db('incidents').insert(newIncident, 'incident_id');
-  await createSource(incident.src, incidentID[0]);
+  await createSource(incident.links, incidentID[0]);
   await createTags(incident.tags, incidentID[0]);
   return { message: 'Success!' };
 }
