@@ -2,13 +2,16 @@ const db = require('../../data/db-config');
 
 module.exports = {
   getAllIncidents,
+  getIncidentById,
+  getTagById,
   createIncident,
   getAllSources,
   getAllTags,
   getAllTagTypes,
   getSourcesById,
   createSingleSource,
-  deleteDB
+  deleteDB,
+  createCategories,
 };
 
 async function getAllIncidents() {
@@ -27,8 +30,15 @@ async function createIncident(incident) {
     title: incident.title,
     lat: incident.lat,
     long: incident.long,
-    desc: incident.desc,
+    desc: incident.description,
     date: incident.date,
+    continuum: incident.tags.shift(),
+    verbalization: incident.verbalization,
+    empty_hand_soft: incident.empty_hand_soft,
+    empty_hand_hard: incident.empty_hand_hard,
+    less_lethal_methods: incident.less_lethal_methods,
+    lethal_force: incident.lethal_force,
+    uncategorized: incident.uncategorized,
   };
   const incidentID = await db('incidents').insert(newIncident, 'incident_id');
   await createSource(incident.links, incidentID[0]);
@@ -37,10 +47,12 @@ async function createIncident(incident) {
 }
 
 async function createTags(tags, incidentID) {
+  // iterate over array of tags
   await tags.forEach(async (tag) => {
-    const tof = await createTypeOfForce({ type_of_force: tag });
-    await createIncidentTypeOfForce(incidentID, tof.type_of_force_id);
+      // for each tag, create a new typeOfForce entry
+      const tof = await createTypeOfForce(tag, incidentID);
   });
+  return;
 }
 
 async function createSource(sources, incidentID) {
@@ -51,27 +63,25 @@ async function createSource(sources, incidentID) {
     };
     await db('sources').insert(source);
   });
+  return;
 }
 
-async function createTypeOfForce(tof) {
-  const forceType = await db('type_of_force').where(
-    'type_of_force',
-    tof.type_of_force
-  );
-  if (!forceType[0]) {
-    forceType[0].type_of_force_id = await db('type_of_force').insert(
-      { type_of_force: tof.type_of_force },
-      'type_of_force_id'
-    );
+async function createTypeOfForce(tof, incidentID) {
+  const incomingTOF = {type_of_force: tof};
+  
+  // check if entry already exists
+  const typeOfForce = await db('type_of_force').where('type_of_force', tof);
+  
+  if (typeOfForce.length < 1) {
+    // if yes, return it, if no, create it and return it
+    const newTof = await db('type_of_force').insert(incomingTOF, 'type_of_force_id');
+    const newLink = await db('incident_type_of_force').insert({"incident_id": incidentID, "type_of_force_id": newTof[0]})
+  
+  
+    return newLink;
+      } else {
+    return typeOfForce;
   }
-  return forceType[0];
-}
-
-async function createIncidentTypeOfForce(incident_id, type_of_force_id) {
-  await db('incident_type_of_force').insert({
-    incident_id: incident_id,
-    type_of_force_id: type_of_force_id,
-  });
 }
 
 function getAllSources() {
@@ -91,8 +101,30 @@ async function createSingleSource(source) {
 }
 
 async function deleteDB() {
-  await db('incident_type_of_force').del()
-  await db('type_of_force').del()
-  await db('sources').del()
-  return await db('incidents').del()
+  await db('incident_type_of_force').del();
+  await db('type_of_force').del();
+  await db('sources').del();
+  return await db('incidents').del();
+}
+
+async function getIncidentById(id) {
+  let incident = await db('incidents').where('incident_id', id);
+  const sources = await getSourcesById(id);
+  const typeLinks = await db('incident_type_of_force').where('incident_id', id);
+  
+  return [incident, sources, typeLinks];
+}
+
+async function getTagById(id) {
+  const tag = await db('type_of_force').where('type_of_force_id', id);
+
+  return tag[0];
+}
+
+function createCategories(array) {
+  return Promise.all(array.map((link) => getTagById(link.type_of_force_id)))
+  .then(response => {
+    return response
+  })
+  .catch(error => error)
 }

@@ -52,11 +52,36 @@ router.get('/showallincidents', async (req, res) => {
   }
 });
 
-router.post('/createincidents', validateIncidents, (req, res) => {
+router.get('/incident/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const incidentQuery = await Incidents.getIncidentById(id);
+    
+    const incident = incidentQuery[0];
+    const src = incidentQuery[1];
+    const tagLinks = incidentQuery[2];
+    incident['src'] = src;
+    
+    const tagItems = await Incidents.createCategories(tagLinks);
+    
+    const categories = [];
+    
+    await tagItems.forEach(async (tag) => {
+      await categories.push(tag.type_of_force)
+    });
+    
+    res.status(200).json({...incident, categories: categories });
+  } catch (e) {
+    res.status(500).json(e);
+  }
+})
+
+router.post('/createincidents',(req, res) => {
   req.body.forEach((incident) => {
     Incidents.createIncident(incident)
 
       .then((post) => {
+        console.log("Added")
         res.status(201).json(post);
       })
       .catch((err) => {
