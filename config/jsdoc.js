@@ -24,6 +24,10 @@ module.exports = {
         name: 'data',
         description: 'Operations for data science service',
       },
+      {
+        name: 'incidents',
+        description: 'Operations for incidents found in database',
+      },
     ],
     externalDocs: {
       description: 'Data Science scaffold service docs',
