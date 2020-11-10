@@ -11,6 +11,13 @@ exports.up = function (knex) {
       incidents.string('title').notNullable();
       incidents.varchar('desc', [1000]);
       incidents.date('date');
+      incidents.string('continuum').notNullable();
+      incidents.boolean('verbalization').defaultsTo(0);
+      incidents.boolean('empty_hand_soft').defaultsTo(0);
+      incidents.boolean('empty_hand_hard').defaultsTo(0);
+      incidents.boolean('less_lethal_methods').defaultsTo(0);
+      incidents.boolean('lethal_force').defaultsTo(0);
+      incidents.boolean('uncategorized').defaultsTo(0);
     })
     .createTable('sources', (sources) => {
       sources.increments('src_id').notNullable().unique().primary();
@@ -20,8 +27,8 @@ exports.up = function (knex) {
     })
     .createTable('incident_type_of_force', (incident_type_of_force) => {
       incident_type_of_force.increments('itof_id');
-      incident_type_of_force.integer('type_of_force_id').notNullable().unique();
-      incident_type_of_force.integer('incident_id').notNullable().unique();
+      incident_type_of_force.integer('type_of_force_id').notNullable();
+      incident_type_of_force.integer('incident_id').notNullable();
     })
     .createTable('type_of_force', (type_of_force) => {
       type_of_force.increments('type_of_force_id');

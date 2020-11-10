@@ -15,6 +15,13 @@ exports.seed = function (knex) {
           id: 'wa-olympia-1',
           lat: 47.0417,
           long: -122.8959,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -26,6 +33,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-1',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -37,6 +51,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-2',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -48,6 +69,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-3',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -59,6 +87,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-4',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -70,6 +105,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-8',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -81,6 +123,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-6',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -92,6 +141,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-12',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
         {
           state: 'Washington',
@@ -104,6 +160,13 @@ exports.seed = function (knex) {
           id: 'wa-seattle-7',
           lat: 47.6211,
           long: -122.3244,
+          continuum: "non_lethal",
+          verbalization: false,
+          empty_hand_soft: false,
+          empty_hand_hard: false,
+          less_lethal_methods: false,
+          lethal_force: false,
+          uncategorized: true
         },
       ]);
     });
