@@ -11,7 +11,6 @@ exports.up = function (knex) {
       incidents.string('title').notNullable();
       incidents.varchar('desc', [1000]);
       incidents.date('date');
-      incidents.string('continuum').notNullable();
       incidents.boolean('verbalization').defaultsTo(0);
       incidents.boolean('empty_hand_soft').defaultsTo(0);
       incidents.boolean('empty_hand_hard').defaultsTo(0);
