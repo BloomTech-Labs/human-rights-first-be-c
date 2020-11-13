@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 
 // Model and util imports
 const Incidents = require('./incidentsModel');
-const { post } = require('../dsService/dsRouter');
-const { validateIncidents } = require('./middleware/index');
+const { dsFetch } = require('../dsService/dsUtil');
 
 // ''' ---------> Incidents Routes <--------- '''
 // ### GET /showallincidents ###
@@ -90,42 +88,13 @@ const { validateIncidents } = require('./middleware/index');
 router.get('/showallincidents', async (req, res) => {
   try {
     const incidents = await Incidents.getAllIncidents();
-    const sources = await Incidents.getAllSources();
-    const tofTypes = await Incidents.getAllTags();
-    const typeLinks = await Incidents.getAllTagTypes();
 
-    const responseArray = [];
-    const tagsArray = [];
-
-    tofTypes.forEach((tof) => {
-      typeLinks.forEach((connection) => {
-        if (connection.type_of_force_id === tof.type_of_force_id) {
-          tagsArray.push({ ...tof, incident_id: connection.incident_id });
-        }
-      });
+    const queryResponse = incidents.map((incident) => {
+      incident.src = JSON.parse(incident.src);
+      incident.categories = JSON.parse(incident.categories);
+      return incident;
     });
-
-    incidents.forEach((incident) => {
-      incident['categories'] = [];
-      tagsArray.forEach((tag) => {
-        if (tag.incident_id === incident.incident_id) {
-          incident.categories.push(tag.type_of_force);
-        }
-      });
-    });
-
-    // Reconstructs the incident object with it's sources to send to front end
-    incidents.forEach((incident) => {
-      incident['src'] = [];
-      sources.forEach((source) => {
-        if (source.incident_id === incident.incident_id) {
-          incident.src.push(source);
-        }
-      });
-
-      responseArray.push(incident);
-    });
-    res.json(responseArray);
+    res.json(queryResponse);
   } catch (e) {
     res.status(500).json({ message: 'Request Error' });
   }
@@ -201,20 +170,10 @@ router.get('/incident/:id', async (req, res) => {
   try {
     const incidentQuery = await Incidents.getIncidentById(id);
 
-    const incident = incidentQuery[0];
-    const src = incidentQuery[1];
-    const tagLinks = incidentQuery[2];
-    incident['src'] = src;
+    incidentQuery[0].src = JSON.parse(incidentQuery[0].src);
+    incidentQuery[0].categories = JSON.parse(incidentQuery[0].categories);
 
-    const tagItems = await Incidents.createCategories(tagLinks);
-
-    const categories = [];
-
-    await tagItems.forEach(async (tag) => {
-      await categories.push(tag.type_of_force);
-    });
-
-    res.status(200).json({ ...incident, categories: categories });
+    res.status(200).json(incidentQuery);
   } catch (e) {
     res.status(500).json(e);
   }
@@ -263,250 +222,13 @@ router.get('/incident/:id', async (req, res) => {
 router.post('/createincidents', (req, res) => {
   req.body.forEach((incident) => {
     Incidents.createIncident(incident)
-
       .then((post) => {
-        console.log('Added');
         res.status(201).json(post);
       })
       .catch((err) => {
         res.status(500).json({ message: 'Error creating Record' });
       });
   });
-});
-
-// ''' ---------> Sources Routes <--------- '''
-// ### GET /sources ###
-// - returns all incident source data
-// ⬇️ swagger docs code generation ⬇️
-/**
- * @swagger
- * /incidents/sources:
- *  get:
- *    summary: path returning all sources in database
- *    tags:
- *      - incidents
- *    produces:
- *      - application/json
- *    responses:
- *      201:
- *        description: success ... returns object containing all source data
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                - api
- *              properties:
- *                data:
- *                  type: array
- *                  example: [
- *                            {
- *                              "src_id": 1,
- *                              "incident_id": 1,
- *                              "src_url": "twitter.com",
- *                              "src_type": "level 2"
- *                            },
- *                            {
- *                              "src_id": 2,
- *                              "incident_id": 1,
- *                              "src_url": "facebook.com",
- *                              "src_type": "level 2"
- *                            },
- *                          ]
- *      500:
- *        description: Server response error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                -api
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Request Error"
- */
-
-router.get('/sources', (req, res) => {
-  Incidents.getAllSources()
-    .then((response) => {
-      res.status(201).json(response);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-// ### GET sources/{id} ###
-// - returns all sources associated with incident ID provided
-// ⬇️ swagger docs code generation ⬇️
-/**
- * @swagger
- * /incidents/sources/{id}:
- *  get:
- *    summary: path returning all sources associated with incident ID provided
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: integer
- *        required: true
- *        description: Numeric ID of the incident to get all sources for
- *    tags:
- *      - incidents
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: success ... returns object containing all source data
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                - api
- *              properties:
- *                data:
- *                  type: array
- *                  example: [
- *                            {
- *                              "src_id": 1,
- *                              "incident_id": 1,
- *                              "src_url": "twitter.com",
- *                              "src_type": "level 2"
- *                            },
- *                            {
- *                              "src_id": 2,
- *                              "incident_id": 1,
- *                              "src_url": "facebook.com",
- *                              "src_type": "level 2"
- *                            },
- *                          ]
- *      500:
- *        description: Server response error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                -api
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Request Error"
- */
-router.get('/sources/:id', (req, res) => {
-  const { id } = req.params;
-  Incidents.getSourcesById(id).then((response) => {
-    res.json(response);
-  });
-});
-// creates a single source by inserting into the database
-router.post('/createsource', (req, res) => {
-  Incidents.createSingleSource(req.body)
-    .then((response) => {
-      res.json(response);
-    })
-    .catch((error) => {
-      res.status(500).json(error);
-    });
-});
-
-// ---------> Types of Force (tags) Routes <---------
-
-// ### GET /tags ###
-// - returns all all possible tags for incident type of force
-// ⬇️ swagger docs code generation ⬇️
-/**
- * @swagger
- * /incidents/tags:
- *  get:
- *    summary: path returning all types-of-force tags for each incident
- *    tags:
- *      - incidents
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: success ... returns array containing types-of-force tags for each incident
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                - api
- *              properties:
- *                data:
- *                  type: array
- *                  example: []
- *      500:
- *        description: Server response error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                -api
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Request Error"
- */
-router.get('/tags', (req, res) => {
-  Incidents.getAllTags()
-    .then((response) => {
-      res.status(200).json(response);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-// ### GET /tagtypes ###
-// - returns all all possible types-of-force tags (categories)
-// ⬇️ swagger docs code generation ⬇️
-/**
- * @swagger
- * /incidents/tagtypes:
- *  get:
- *    summary: path returning all types-of-force tags
- *    tags:
- *      - incidents
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: success ... returns array containing all types-of-force tags
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                - api
- *              properties:
- *                data:
- *                  type: array
- *                  example: []
- *      500:
- *        description: Server response error
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              required:
- *                -api
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Request Error"
- */
-router.get('/tagtypes', (req, res) => {
-  Incidents.getAllTagTypes()
-    .then((response) => {
-      res.status(200).json(response);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
 });
 
 // ###Utility Routes###
@@ -520,18 +242,13 @@ router.delete('/cleardb', (req, res) => {
     });
 });
 
-router.post('/fetchfromds', (req, res) => {
-  axios
-    .get(process.env.DS_API_URL)
-    .then((response) => {
-      response.data.forEach((element) => {
-        Incidents.createIncident(element);
-      });
-      res.json({ message: 'complete' });
-    })
-    .catch((err) => {
-      res.json(error);
-    });
+router.post('/fetchfromds', async (req, res) => {
+  try {
+    await dsFetch();
+    res.json({ message: 'Operation successful' });
+  } catch (e) {
+    res.json({ message: 'Error with operation', error: e });
+  }
 });
 
 module.exports = router;
