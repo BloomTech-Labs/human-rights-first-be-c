@@ -20,7 +20,7 @@ const { dsFetch } = require('../dsService/dsUtil');
  *      - application/json
  *    responses:
  *      200:
- *        description: success ... returns an incident object with all sources
+ *        description: success ... returns an array of incident objects
  *        content:
  *          application/json:
  *            schema:
@@ -32,45 +32,67 @@ const { dsFetch } = require('../dsService/dsUtil');
  *                  type: array
  *                  example: [
   {
-    "id": 1,
-    "dates": "2020-05-26 00:00:00",
-    "added_on": "2020-11-09 10:27:02.184009",
-    "links": "['https://www.facebook.com/1462345700/posts/10220863688809651', 'https://www.facebook.com/1462345700/posts/10220863812572745']",
-    "case_id": "mn-minneapolis-14",
-    "city": "Minneapolis",
-    "state": "Minnesota",
-    "lat": 44.94811,
-    "long": -93.2369906,
-    "title": "Police shoot flashbang grenades into crowd",
-    "description": "Police on the rooftop of the 3rd precinct fire flashbang grenades into crowd of peaceful protesters.",
-    "tags": "['less-lethal', 'rubber-bullet', 'stun-grenade', 'tear-gas']",
-    "verbalization": 0,
-    "empty_hand_soft": 0,
-    "empty_hand_hard": 0,
-    "less_lethal_methods": 1,
-    "lethal_force": 0,
-    "uncategorized": 0
+    incident_id: 'mn-minneapolis-14',
+    src: [
+      'https://www.facebook.com/1462345700/posts/10220863688809651',
+      'https://www.facebook.com/1462345700/posts/10220863812572745'
+    ],
+    categories: [ 'less-lethal', 'rubber-bullet', 'stun-grenade', 'tear-gas' ],
+    city: 'Minneapolis',
+    state: 'Minnesota',
+    lat: 44.94811,
+    long: -93.23699,
+    title: 'Police shoot flashbang grenades into crowd',
+    desc: 'Police on the rooftop of the 3rd precinct fire flashbang grenades into crowd of peaceful protesters.',
+    date: 2020-05-26T05:00:00.000Z,
+    verbalization: false,
+    empty_hand_soft: false,
+    empty_hand_hard: false,
+    less_lethal_methods: true,
+    lethal_force: false,
+    uncategorized: false
   },
   {
-    "id": 2,
-    "dates": "2020-05-26 00:00:00",
-    "added_on": "2020-11-09 10:27:02.369103",
-    "links": "['https://www.facebook.com/damicedsota.thespiritflow/videos/10216865788705633/UzpfSTEwMDAxMTAzODkyNjEwMzpWSzoyNjczNDU4ODUyOTMzODE2/']",
-    "case_id": "mn-minneapolis-28",
-    "city": "Minneapolis",
-    "state": "Minnesota",
-    "lat": 44.9413248,
-    "long": -93.2626097,
-    "title": "Man has his gun confiscated in an open carry state, violating his 2nd amendment rights",
-    "description": "Man encounters police arresting people open carrying (~3 minutes in), man is then also put in handcuffs (~5 minutes in) and his gun taken.",
-    "tags": "['abuse-of-power', 'arrest']",
-    "verbalization": 0,
-    "empty_hand_soft": 0,
-    "empty_hand_hard": 0,
-    "less_lethal_methods": 0,
-    "lethal_force": 0,
-    "uncategorized": 1
+    incident_id: 'mn-minneapolis-28',
+    src: [
+      'https://www.facebook.com/damicedsota.thespiritflow/videos/10216865788705633/UzpfSTEwMDAxMTAzODkyNjEwMzpWSzoyNjczNDU4ODUyOTMzODE2/'
+    ],
+    categories: [ 'abuse-of-power', 'arrest' ],
+    city: 'Minneapolis',
+    state: 'Minnesota',
+    lat: 44.941326,
+    long: -93.26261,
+    title: 'Man has his gun confiscated in an open carry state, violating his 2nd amendment rights',
+    desc: 'Man encounters police arresting people open carrying (~3 minutes in), man is then also put in handcuffs (~5 minutes in) and his gun taken.',
+    date: 2020-05-26T05:00:00.000Z,
+    verbalization: false,
+    empty_hand_soft: false,
+    empty_hand_hard: false,
+    less_lethal_methods: false,
+    lethal_force: false,
+    uncategorized: true
   },
+  {
+    incident_id: 'co-denver-1',
+    src: [
+      'https://www.denverpost.com/2020/05/29/denver-post-photographer-pepper-balls-george-floyd-protest/',
+      'https://www.nytimes.com/2020/06/01/business/media/reporters-protests-george-floyd.html'
+    ],
+    categories: [ 'less-lethal', 'pepper-ball', 'shoot' ],
+    city: 'Denver',
+    state: 'Colorado',
+    lat: 39.73844,
+    long: -104.98626,
+    title: 'Reporter shot with multiple pepper balls',
+    desc: 'He states the officer aimed at him, and the pepper balls broke his press badge and drew blood',
+    date: 2020-05-28T05:00:00.000Z,
+    verbalization: false,
+    empty_hand_soft: false,
+    empty_hand_hard: false,
+    less_lethal_methods: true,
+    lethal_force: false,
+    uncategorized: false
+  }
 ]
  *      500:
  *        description: Server response error
@@ -99,21 +121,22 @@ router.get('/showallincidents', async (req, res) => {
     res.status(500).json({ message: 'Request Error' });
   }
 });
-// ### GET /incident/{id} ###
-// - returns a singular incident per {id} passed in
+
+// ### GET /incident/{incident_id} ###
+// - returns a singular incident based on {incident_id} passed in
 // ⬇️ swagger docs code generation ⬇️
 /**
  * @swagger
- * /incidents/incident/{id}:
+ * /incidents/incident/{incident_id}:
  *  get:
- *    summary: path returning single incident associated with ID provided
+ *    summary: path returning single incident associated with id provided
  *    parameters:
  *      - in: path
- *        name: id
+ *        name: incident_id
  *        schema:
- *          type: integer
+ *          type: string
  *        required: true
- *        description: Numeric ID of the incident to get data for
+ *        description: unique id of the incident to get return data for
  *    tags:
  *      - incidents
  *    produces:
@@ -130,28 +153,27 @@ router.get('/showallincidents', async (req, res) => {
  *              properties:
  *                data:
  *                  type: array
- *                  example: [
-  {
-    "id": 1,
-    "dates": "2020-05-26 00:00:00",
-    "added_on": "2020-11-09 10:27:02.184009",
-    "links": "['https://www.facebook.com/1462345700/posts/10220863688809651', 'https://www.facebook.com/1462345700/posts/10220863812572745']",
-    "case_id": "mn-minneapolis-14",
-    "city": "Minneapolis",
-    "state": "Minnesota",
-    "lat": 44.94811,
-    "long": -93.2369906,
-    "title": "Police shoot flashbang grenades into crowd",
-    "description": "Police on the rooftop of the 3rd precinct fire flashbang grenades into crowd of peaceful protesters.",
-    "tags": "['less-lethal', 'rubber-bullet', 'stun-grenade', 'tear-gas']",
-    "verbalization": 0,
-    "empty_hand_soft": 0,
-    "empty_hand_hard": 0,
-    "less_lethal_methods": 1,
-    "lethal_force": 0,
-    "uncategorized": 0
-  }
-]
+ *                  example:   [{
+    incident_id: 'mn-minneapolis-14',
+    src: [
+      'https://www.facebook.com/1462345700/posts/10220863688809651',
+      'https://www.facebook.com/1462345700/posts/10220863812572745'
+    ],
+    categories: [ 'less-lethal', 'rubber-bullet', 'stun-grenade', 'tear-gas' ],
+    city: 'Minneapolis',
+    state: 'Minnesota',
+    lat: 44.94811,
+    long: -93.23699,
+    title: 'Police shoot flashbang grenades into crowd',
+    desc: 'Police on the rooftop of the 3rd precinct fire flashbang grenades into crowd of peaceful protesters.',
+    date: 2020-05-26T05:00:00.000Z,
+    verbalization: false,
+    empty_hand_soft: false,
+    empty_hand_hard: false,
+    less_lethal_methods: true,
+    lethal_force: false,
+    uncategorized: false
+  }]
  *      500:
  *        description: Server response error
  *        content:
