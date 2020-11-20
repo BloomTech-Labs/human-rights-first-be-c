@@ -117,6 +117,7 @@ router.get('/showallincidents', async (req, res) => {
       return incident;
     });
     res.json(queryResponse);
+
   } catch (e) {
     res.status(500).json({ message: 'Request Error' });
   }
